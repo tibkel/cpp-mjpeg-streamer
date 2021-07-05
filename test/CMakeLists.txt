@@ -12,19 +12,16 @@ if(NADJIEB_MJPEG_STREAMER_Coverage)
     file(GLOB_RECURSE SOURCE_FILES ${NADJIEB_MJPEG_STREAMER_INCLUDE_BUILD_DIR}*.hpp)
 
     # add target to collect coverage information and generate HTML file
-    # (filter script from https://stackoverflow.com/a/43726240/266378)
     add_custom_target(lcov_html
-        COMMAND lcov --directory . --capture --output-file nadjieb_mjpeg_streamer.info --rc lcov_branch_coverage=1
-        COMMAND lcov -e nadjieb_mjpeg_streamer.info ${SOURCE_FILES} --output-file nadjieb_mjpeg_streamer.info.filtered --gcov-tool ${GCOV_BIN} --rc lcov_branch_coverage=1
-        COMMAND ${CMAKE_SOURCE_DIR}/thirdparty/imapdl/filterbr.py nadjieb_mjpeg_streamer.info.filtered > nadjieb_mjpeg_streamer.info.filtered.noexcept
-        COMMAND genhtml --title "C++ MJPEG over HTTP Library" --legend --demangle-cpp --output-directory html --show-details --branch-coverage nadjieb_mjpeg_streamer.info.filtered.noexcept
+        COMMAND lcov --directory . --capture --output-file nadjieb_mjpeg_streamer.info
+        COMMAND lcov --extract nadjieb_mjpeg_streamer.info ${SOURCE_FILES} --output-file nadjieb_mjpeg_streamer.info.filtered --gcov-tool ${GCOV_BIN}
+        COMMAND genhtml --title "C++ MJPEG over HTTP Library" --legend --output-directory html --show-details nadjieb_mjpeg_streamer.info.filtered
         COMMENT "Generating HTML report test/html/index.html"
     )
 
     add_custom_target(lcov
-        COMMAND lcov --directory . --capture --output-file nadjieb_mjpeg_streamer.info --rc lcov_branch_coverage=1
-        COMMAND lcov -e nadjieb_mjpeg_streamer.info ${SOURCE_FILES} --output-file nadjieb_mjpeg_streamer.info.filtered --gcov-tool ${GCOV_BIN} --rc lcov_branch_coverage=1
-        COMMAND ${CMAKE_SOURCE_DIR}/thirdparty/imapdl/filterbr.py nadjieb_mjpeg_streamer.info.filtered > nadjieb_mjpeg_streamer.info.filtered.noexcept
+        COMMAND lcov --directory . --capture --output-file nadjieb_mjpeg_streamer.info
+        COMMAND lcov --extract nadjieb_mjpeg_streamer.info ${SOURCE_FILES} --output-file nadjieb_mjpeg_streamer.info.filtered --gcov-tool ${GCOV_BIN}
     )
 endif()
 
@@ -60,7 +57,7 @@ foreach(file ${files})
         $<$<NOT:$<CXX_COMPILER_ID:MSVC>>:-Wno-deprecated;-Wno-float-equal>
         $<$<CXX_COMPILER_ID:GNU>:-Wno-deprecated-declarations>
     )
-    target_include_directories(${testcase} PRIVATE ${CMAKE_BINARY_DIR}/include include)
+    target_include_directories(${testcase} PRIVATE ${PROJECT_SOURCE_DIR}/include ${PROJECT_SOURCE_DIR}/test/include)
     target_link_libraries(${testcase} PRIVATE ${NADJIEB_MJPEG_STREAMER_TARGET_NAME})
 
     if (NADJIEB_MJPEG_STREAMER_Coverage)
